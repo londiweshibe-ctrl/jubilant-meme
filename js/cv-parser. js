@@ -1,0 +1,331 @@
+const CVParser = (function() {
+  
+  const SKILL_TAXONOMY = {
+    'financial_analysis': {
+      canonical: 'Financial Analysis',
+      synonyms: ['financial analyst', 'fin analysis', 'finance analysis', 'financial reporting', 'financial reports', 'reporting', 'analysis'],
+      related: ['excel', 'forecasting', 'budgeting', 'variance analysis']
+    },
+    'financial_modelling': {
+      canonical: 'Financial Modelling',
+      synonyms: ['financial modeling', '3-way model', 'dcf', 'dcf model', 'valuation model', 'forecast model', 'modelling', 'modeling'],
+      related: ['excel', 'vba', 'python']
+    },
+    'excel': {
+      canonical: 'Excel',
+      synonyms: ['microsoft excel', 'ms excel', 'advanced excel', 'excel vba', 'pivot tables', 'vlookup', 'spreadsheets'],
+      related: ['financial modelling', 'data analysis']
+    },
+    'sql': {
+      canonical: 'SQL',
+      synonyms: ['mysql', 'postgresql', 'tsql', 'pl/sql', 'database queries', 'query writing', 'database'],
+      related: ['data analysis', 'database design', 'python', 'r']
+    },
+    'python': {
+      canonical: 'Python',
+      synonyms: ['py', 'pandas', 'numpy', 'jupyter', 'python scripting', 'programming'],
+      related: ['machine learning', 'data analysis', 'sql', 'automation']
+    },
+    'project_management': {
+      canonical: 'Project Management',
+      synonyms: ['pm', 'project manager', 'project lead', 'program management', 'project coordination', 'managing projects'],
+      related: ['stakeholder management', 'agile', 'scrum', 'budgeting']
+    },
+    'stakeholder_management': {
+      canonical: 'Stakeholder Management',
+      synonyms: ['stakeholder engagement', 'client management', 'relationship management', 'people management', 'stakeholder'],
+      related: ['project management', 'communication', 'leadership']
+    },
+    'agile': {
+      canonical: 'Agile',
+      synonyms: ['scrum', 'kanban', 'sprint planning', 'user stories', 'backlog grooming', 'agile methodology'],
+      related: ['project management', 'jira', 'confluence']
+    },
+    'data_analysis': {
+      canonical: 'Data Analysis',
+      synonyms: ['data analytics', 'data analyst', 'analyzing data', 'insights', 'data-driven', 'analytics'],
+      related: ['sql', 'python', 'excel', 'tableau', 'statistics']
+    },
+    'tableau': {
+      canonical: 'Tableau',
+      synonyms: ['tableau desktop', 'tableau server', 'data visualization', 'viz', 'dashboards'],
+      related: ['data analysis', 'sql', 'power bi']
+    },
+    'sap': {
+      canonical: 'SAP',
+      synonyms: ['sap fico', 'sap erp', 's/4hana', 'sap implementation', 'erp'],
+      related: ['accounting', 'financial analysis']
+    },
+    'accounting': {
+      canonical: 'Accounting',
+      synonyms: ['accountant', 'ca', 'chartered accountant', 'general ledger', 'gaap', 'ifrs', 'bookkeeping'],
+      related: ['financial analysis', 'sap', 'audit']
+    },
+    'budgeting': {
+      canonical: 'Budgeting',
+      synonyms: ['budget', 'budget management', 'forecasting', 'financial planning', 'fp&a'],
+      related: ['financial analysis', 'excel', 'variance analysis']
+    },
+    'variance_analysis': {
+      canonical: 'Variance Analysis',
+      synonyms: ['variance', 'budget variance', 'actual vs budget', 'financial variance'],
+      related: ['budgeting', 'financial analysis', 'excel']
+    },
+    'forecasting': {
+      canonical: 'Forecasting',
+      synonyms: ['forecast', 'financial forecast', 'predictive analysis', 'projection'],
+      related: ['financial modelling', 'excel', 'budgeting']
+    },
+    'leadership': {
+      canonical: 'Leadership',
+      synonyms: ['leading', 'team lead', 'management', 'people management', 'supervising', 'mentoring'],
+      related: ['project management', 'stakeholder management']
+    },
+    'communication': {
+      canonical: 'Communication',
+      synonyms: ['presenting', 'presentation', 'written communication', 'verbal communication', 'interpersonal'],
+      related: ['stakeholder management', 'leadership']
+    },
+    'powerpoint': {
+      canonical: 'PowerPoint',
+      synonyms: ['presentations', 'slide decks', 'microsoft powerpoint', 'storytelling'],
+      related: ['communication', 'stakeholder management']
+    }
+  };
+
+  const ROLE_DEFINITIONS = [
+    {
+      id: 'financial_analyst',
+      title: 'Financial Analyst',
+      level: 'Mid-level',
+      category: 'finance',
+      requiredSkills: ['financial_analysis', 'excel', 'financial_modelling', 'accounting'],
+      niceToHave: ['sap', 'sql', 'tableau', 'forecasting', 'budgeting', 'variance_analysis'],
+      industries: ['Banking', 'Corporate', 'Consulting']
+    },
+    {
+      id: 'senior_financial_analyst',
+      title: 'Senior Financial Analyst',
+      level: 'Senior',
+      category: 'finance',
+      requiredSkills: ['financial_analysis', 'excel', 'financial_modelling', 'accounting', 'stakeholder_management'],
+      niceToHave: ['sap', 'sql', 'tableau', 'forecasting', 'budgeting', 'leadership', 'variance_analysis'],
+      industries: ['Banking', 'Corporate', 'Private Equity']
+    },
+    {
+      id: 'fpa_manager',
+      title: 'FP&A Manager',
+      level: 'Senior',
+      category: 'finance',
+      requiredSkills: ['financial_modelling', 'excel', 'forecasting', 'budgeting', 'stakeholder_management', 'variance_analysis'],
+      niceToHave: ['sap', 'leadership', 'strategic_planning', 'accounting'],
+      industries: ['Corporate', 'Insurance', 'Banking']
+    },
+    {
+      id: 'data_analyst',
+      title: 'Data Analyst',
+      level: 'Mid-level',
+      category: 'data',
+      requiredSkills: ['sql', 'data_analysis', 'excel'],
+      niceToHave: ['python', 'tableau', 'statistics', 'machine_learning', 'forecasting'],
+      industries: ['Technology', 'Finance', 'Consulting', 'E-commerce']
+    },
+    {
+      id: 'business_analyst',
+      title: 'Business Analyst',
+      level: 'Mid-level',
+      category: 'business',
+      requiredSkills: ['stakeholder_management', 'data_analysis', 'excel', 'communication'],
+      niceToHave: ['sql', 'agile', 'project_management', 'powerpoint', 'tableau'],
+      industries: ['Consulting', 'Banking', 'Technology', 'Telecoms']
+    },
+    {
+      id: 'project_manager',
+      title: 'Project Manager',
+      level: 'Senior',
+      category: 'business',
+      requiredSkills: ['project_management', 'stakeholder_management', 'budgeting', 'leadership'],
+      niceToHave: ['agile', 'scrum', 'communication', 'powerpoint', 'risk_management'],
+      industries: ['Construction', 'IT', 'Consulting', 'Engineering']
+    },
+    {
+      id: 'software_engineer',
+      title: 'Software Engineer',
+      level: 'Mid-level',
+      category: 'technology',
+      requiredSkills: ['python', 'sql', 'programming'],
+      niceToHave: ['agile', 'leadership', 'communication', 'project_management'],
+      industries: ['Technology', 'Finance', 'E-commerce']
+    }
+  ];
+
+  function normalizeSkills(rawInputs) {
+    const foundSkills = new Map();
+    
+    rawInputs.forEach(input => {
+      const clean = input.toLowerCase().trim();
+      if (!clean) return;
+      
+      Object.entries(SKILL_TAXONOMY).forEach(([key, data]) => {
+        // Direct match
+        if (clean === data.canonical.toLowerCase()) {
+          foundSkills.set(key, { confidence: 1.0, canonical: data.canonical });
+          return;
+        }
+        
+        // Synonym match
+        const synonymMatch = data.synonyms.some(syn => 
+          clean === syn.toLowerCase() || 
+          clean.includes(syn.toLowerCase()) ||
+          syn.toLowerCase().includes(clean)
+        );
+        
+        if (synonymMatch) {
+          const current = foundSkills.get(key);
+          if (!current || current.confidence < 0.9) {
+            foundSkills.set(key, { confidence: 0.9, canonical: data.canonical });
+          }
+        }
+        
+        // Related match (only if no direct/synonym match)
+        const relatedMatch = data.related.some(rel => 
+          clean.includes(rel.toLowerCase())
+        );
+        
+        if (relatedMatch && !foundSkills.has(key)) {
+          foundSkills.set(key, { confidence: 0.7, canonical: data.canonical });
+        }
+      });
+    });
+    
+    return Array.from(foundSkills.entries()).map(([id, data]) => ({
+      id: id,
+      canonical: data.canonical,
+      confidence: data.confidence,
+      related: SKILL_TAXONOMY[id].related.slice(0, 3)
+    }));
+  }
+
+  function calculateRoleMatch(userSkills, role) {
+    const matchedRequired = [];
+    const matchedNice = [];
+    const missingRequired = [];
+    
+    // Check required skills
+    role.requiredSkills.forEach(req => {
+      const match = userSkills.find(us => us.id === req);
+      if (match && match.confidence > 0.6) {
+        matchedRequired.push(match);
+      } else {
+        missingRequired.push(req);
+      }
+    });
+    
+    // Check nice-to-have
+    role.niceToHave.forEach(nice => {
+      const match = userSkills.find(us => us.id === nice);
+      if (match && match.confidence > 0.6) {
+        matchedNice.push(match);
+      }
+    });
+    
+    // Calculate score
+    const requiredCoverage = matchedRequired.length / role.requiredSkills.length;
+    const niceBonus = matchedNice.length * 0.03;
+    let score = Math.round((requiredCoverage * 100) + (niceBonus * 100));
+    score = Math.min(98, Math.max(0, score));
+    
+    // Determine quality
+    let quality = 'weak';
+    if (score >= 75 && requiredCoverage >= 0.8) quality = 'strong';
+    else if (score >= 50 && requiredCoverage >= 0.5) quality = 'moderate';
+    else if (score >= 30) quality = 'potential';
+    
+    return {
+      role: role,
+      score: score,
+      quality: quality,
+      matchedRequired: matchedRequired,
+      matchedNice: matchedNice,
+      missingRequired: missingRequired,
+      coverage: requiredCoverage,
+      matchedSkills: matchedRequired.map(s => s.canonical),
+      missingSkills: missingRequired.map(id => SKILL_TAXONOMY[id]?.canonical || id)
+    };
+  }
+
+  return {
+    parse: function(rawInputs) {
+      return normalizeSkills(rawInputs);
+    },
+    
+    matchRoles: function(parsedSkills) {
+      return ROLE_DEFINITIONS.map(role => 
+        calculateRoleMatch(parsedSkills, role)
+      ).sort((a, b) => b.score - a.score);
+    },
+    
+    getSkillGaps: function(match) {
+      if (!match || match.quality === 'strong') return [];
+      return match.missingRequired.slice(0, 3).map(skillId => ({
+        skill: SKILL_TAXONOMY[skillId]?.canonical || skillId,
+        impact: 'high',
+        reason: 'Required for this role'
+      }));
+    },
+    
+    getAdjacentSkills: function(parsedSkills) {
+      const userSkillIds = new Set(parsedSkills.map(s => s.id));
+      const adjacent = new Map();
+      
+      parsedSkills.forEach(skill => {
+        skill.related.forEach(rel => {
+          if (!userSkillIds.has(rel) && SKILL_TAXONOMY[rel]) {
+            const count = adjacent.get(rel) || 0;
+            adjacent.set(rel, count + 1);
+          }
+        });
+      });
+      
+      return Array.from(adjacent.entries())
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 4)
+        .map(([skillId, weight]) => ({
+          skill: SKILL_TAXONOMY[skillId].canonical,
+          weight: weight,
+          reason: 'Frequently paired with your skills'
+        }));
+    },
+    
+    getCareerPaths: function(parsedSkills, topMatch) {
+      const paths = [];
+      const category = topMatch?.role.category;
+      
+      if (category === 'finance') {
+        paths.push({
+          path: 'Corporate Finance',
+          progression: ['Financial Analyst', 'Senior FA', 'FP&A Manager', 'Finance Director'],
+          match: topMatch?.score || 0
+        });
+      } else if (category === 'data') {
+        paths.push({
+          path: 'Data Science',
+          progression: ['Data Analyst', 'Senior Analyst', 'Data Scientist', 'Lead DS'],
+          match: topMatch?.score || 0
+        });
+      } else if (category === 'business') {
+        paths.push({
+          path: 'Management Consulting',
+          progression: ['Business Analyst', 'Consultant', 'Manager', 'Partner'],
+          match: topMatch?.score || 0
+        });
+      }
+      
+      return paths;
+    },
+    
+    getTaxonomy: function() {
+      return SKILL_TAXONOMY;
+    }
+  };
+})();
