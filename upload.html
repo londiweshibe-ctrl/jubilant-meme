@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CVKonnekt — Upload Your CV</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #0d0d0d;
+  --paper: #f5f0e8;
+  --gold: #c9a84c;
+  --gold-light: #e8c96a;
+  --muted: #6b6b6b;
+  --border: #e0d8cc;
+  --green: #2d7a4f;
+  --green-light: #e8f5ee;
+  --error: #c0392b;
+  --charcoal: #1a1a2e;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 400;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  -webkit-font-smoothing: antialiased;
+}
+
+nav {
+  padding: 1.25rem 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  background: rgba(245,240,232,0.9);
+  backdrop-filter: blur(12px);
+}
+
+.logo { 
+  font-family: 'Newsreader', serif; 
+  font-size: 1.4rem; 
+  font-weight: 600; 
+  text-decoration: none; 
+  color: var(--ink);
+  letter-spacing: -0.02em;
+}
+.logo span { color: var(--gold); }
+.nav-right { 
+  font-size: 0.875rem; 
+  color: var(--muted);
+  letter-spacing: -0.01em;
+}
+
+.progress-wrap {
+  background: white;
+  border-bottom: 1px solid var(--border);
+  padding: 0 2.5rem;
+}
+
+.progress-steps {
+  display: flex;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.step-tab {
+  flex: 1;
+  padding: 1rem 0;
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--muted);
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+  cursor: default;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.step-tab.active {
+  color: var(--ink);
+  border-bottom-color: var(--gold);
+  font-weight: 600;
+}
+
+.step-tab.done {
+  color: var(--green);
+  border-bottom-color: var(--green);
+}
+
+.step-num {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: var(--border);
+  color: var(--muted);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.step-tab.active .step-num { background: var(--gold); color: var(--ink); }
+.step-tab.done .step-num { background: var(--green); color: white; }
+
+.main {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 3rem 1.5rem 5rem;
+}
+
+.container {
+  width: 100%;
+  max-width: 640px;
+}
+
+.screen { display: none; }
+.screen.active { display: block; }
+
+.screen-header {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.eyebrow {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 0.75rem;
+}
+
+.screen-title {
+  font-family: 'Newsreader', serif;
+  font-size: clamp(1.75rem, 5vw, 2.25rem);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  margin-bottom: 0.5rem;
+  line-height: 1.15;
+}
+
+.screen-sub {
+  font-size: 0.9375rem;
+  color: var(--muted);
+  line-height: 1.6;
+  letter-spacing: -0.01em;
+}
+
+.upload-zone {
+  border: 2px dashed var(--border);
+  border-radius: 12px;
+  padding: 3.5rem 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: white;
+  position: relative;
+}
+
+.upload-zone:hover, .upload-zone.dragover {
+  border-color: var(--gold);
+  background: #fffdf7;
+}
+
+.upload-zone input[type="file"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+}
+
+.upload-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+
+.upload-title {
+  font-family: 'Newsreader', serif;
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.4rem;
+}
+
+.upload-sub { 
+  font-size: 0.875rem; 
+  color: var(--muted);
+  letter-spacing: -0.01em;
+  margin-bottom: 1.25rem; 
+}
+
+.upload-types {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.type-badge {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.6875rem;
+  color: var(--muted);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.or-divider {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 1.75rem 0;
+  color: var(--muted);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.or-divider::before, .or-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.manual-option {
+  background: white;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.manual-option:hover { border-color: var(--gold); background: #fffdf7; }
+.manual-title { 
+  font-size: 0.9375rem; 
+  font-weight: 500; 
+  letter-spacing: -0.01em;
+  margin-bottom: 0.2rem; 
+}
+.manual-sub { 
+  font-size: 0.8125rem; 
+  color: var(--muted);
+  letter-spacing: -0.01em;
+}
+.arrow { 
+  font-size: 1.25rem; 
+  color: var(--muted);
+  font-family: 'Inter', sans-serif;
+}
+
+.file-selected {
+  display: none;
+  background: var(--green-light);
+  border: 1.5px solid #b6d9c4;
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+.file-selected.visible { display: flex; }
+.file-icon { font-size: 1.5rem; }
+.file-info { flex: 1; }
+.file-name { 
+  font-size: 0.9375rem; 
+  font-weight: 500; 
+  color: var(--green);
+  letter-spacing: -0.01em;
+}
+.file-size { 
+  font-size: 0.8125rem; 
+  color: var(--muted);
+  letter-spacing: -0.01em;
+}
+.file-remove { 
+  background: none; 
+  border: none; 
+  color: var(--muted); 
+  cursor: pointer; 
+  font-size: 1rem; 
+  padding: 0.25rem;
+  font-family: 'Inter', sans-serif;
+}
+.file-remove:hover { color: var(--error); }
+
+.analyse-btn {
+  background: var(--ink);
+  color: var(--paper);
+  border: none;
+  border-radius: 6px;
+  padding: 0.875rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  font-family: 'Inter', sans-serif;
+  letter-spacing: -0.01em;
+  margin-top: 1.5rem;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+.analyse-btn:hover { background: var(--gold); color: var(--ink); }
+.analyse-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.form-group { margin-bottom: 1.5rem; }
+.form-label { 
+  font-size: 0.8125rem; 
+  font-weight: 500; 
+  margin-bottom: 0.5rem; 
+  display: block; 
+  letter-spacing: -0.01em;
+}
+.form-input {
+  width: 100%;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9375rem;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  background: white;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.form-input:focus { border-color: var(--gold); }
+
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+select.form-input { cursor: pointer; }
+
+.tag-input-wrap {
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  padding: 0.5rem;
+  background: white;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  min-height: 52px;
+  cursor: text;
+  transition: border-color 0.2s;
+}
+.tag-input-wrap:focus-within { border-color: var(--gold); }
+
+.tag {
+  background: var(--ink);
+  color: var(--paper);
+  border-radius: 20px;
+  padding: 0.25rem 0.6rem 0.25rem 0.8rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  letter-spacing: -0.01em;
+}
+.tag-remove { 
+  cursor: pointer; 
+  opacity: 0.6; 
+  font-size: 0.875rem;
+  font-family: 'Inter', sans-serif;
+}
+.tag-remove:hover { opacity: 1; }
+
+.tag-input {
+  border: none;
+  outline: none;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9375rem;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  flex: 1;
+  min-width: 120px;
+  padding: 0.35rem 0.5rem;
+  background: transparent;
+}
+
+.form-hint { 
+  font-size: 0.8125rem; 
+  color: var(--muted); 
+  margin-top: 0.4rem;
+  letter-spacing: -0.01em;
+}
+
+.back-btn {
+  background: none;
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  padding: 0.75rem 1.25rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  color: var(--muted);
+  margin-top: 0.75rem;
+  width: 100%;
+  transition: all 0.2s;
+  letter-spacing: -0.01em;
+}
+.back-btn:hover { border-color: var(--ink); color: var(--ink); }
+
+/* Results Screen */
+.insights-container {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.readiness-score {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+
+.score-circle {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: conic-gradient(var(--gold) calc(var(--score) * 1%), var(--border) 0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.score-circle::before {
+  content: '';
+  position: absolute;
+  width: 64px;
+  height: 64px;
+  background: white;
+  border-radius: 50%;
+}
+
+.score-value {
+  position: relative;
+  font-family: 'Newsreader', serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.score-label {
+  font-size: 0.875rem;
+  color: var(--muted);
+  letter-spacing: -0.01em;
+}
+
+.match-card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.match-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+}
+
+.match-title {
+  font-family: 'Newsreader', serif;
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.match-meta {
+  font-size: 0.8125rem;
+  color: var(--muted);
+  letter-spacing: -0.01em;
+}
+
+.match-quality {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: 20px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.quality-strong { background: var(--green-light); color: var(--green); }
+.quality-moderate { background: #fff3cd; color: #856404; }
+.quality-weak { background: #f8d7da; color: #721c24; }
+
+.skill-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  margin-top: 0.75rem;
+}
+
+.skill-pill {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  letter-spacing: -0.01em;
+}
+
+.skill-pill.matched {
+  background: var(--green-light);
+  border-color: #b6d9c4;
+  color: var(--green);
+}
+
+.keyword-section {
+  background: #fffdf7;
+  border: 1px solid var(--gold);
+  border-radius: 10px;
+  padding: 1.25rem;
+  margin-top: 1.5rem;
+}
+
+.keyword-section h4 {
+  font-family: 'Newsreader', serif;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: var(--gold);
+}
+
+.keyword-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.keyword-tag {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.keyword-tag:hover {
+  border-color: var(--gold);
+  background: var(--paper);
+}
+
+.suggestion-alert {
+  background: #e7f3ff;
+  border-left: 3px solid #0066cc;
+  padding: 1rem;
+  border-radius: 0 8px 8px 0;
+  margin-top: 1rem;
+}
+
+.suggestion-alert h4 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+  color: #004494;
+}
+
+.suggestion-alert p {
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+
+@media (max-width: 600px) {
+  .form-row { grid-template-columns: 1fr; }
+  nav { padding: 1rem 1.25rem; }
+  .main { padding: 2rem 1rem 4rem; }
+  .readiness-score { flex-direction: column; text-align: center; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="index.html">CV<span>Konnekt</span></a>
+  <div class="nav-right" id="navStatus">Step 1 of 3 — Upload</div>
+</nav>
+
+<div class="progress-wrap">
+  <div class="progress-steps">
+    <div class="step-tab active" id="tab1"><div class="step-num">1</div> Upload</div>
+    <div class="step-tab" id="tab2"><div class="step-num">2</div> Analyzing</div>
+    <div class="step-tab" id="tab3"><div class="step-num">3</div> Results</div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="container">
+
+    <!-- Upload Screen -->
+    <div class="screen active" id="screen-upload">
+      <div class="screen-header">
+        <p class="eyebrow">Let's get started</p>
+        <h1 class="screen-title">Upload your CV</h1>
+        <p class="screen-sub">We'll analyze your skills and experience to find your best career matches.</p>
+      </div>
+
+      <div class="file-selected" id="fileSelected">
+        <div class="file-icon">📄</div>
+        <div class="file-info">
+          <div class="file-name" id="fileName">—</div>
+          <div class="file-size" id="fileSize">—</div>
+        </div>
+        <button class="file-remove" onclick="removeFile()">✕</button>
+      </div>
+
+      <div class="upload-zone" id="dropZone">
+        <input type="file" id="fileInput" accept=".pdf,.doc,.docx" onchange="handleFile(this.files[0])">
+        <div class="upload-icon">📎</div>
+        <div class="upload-title">Drop your CV here</div>
+        <div class="upload-sub">or click to browse</div>
+        <div class="upload-types">
+          <span class="type-badge">PDF</span>
+          <span class="type-badge">DOC</span>
+          <span class="type-badge">DOCX</span>
+        </div>
+      </div>
+
+      <div class="or-divider">or</div>
+
+      <div class="manual-option" onclick="goManual()">
+        <div>
+          <div class="manual-title">Enter details manually</div>
+          <div class="manual-sub">Quick 2-minute profile</div>
+        </div>
+        <span class="arrow">→</span>
+      </div>
+
+      <button class="analyse-btn" id="analyseBtn" disabled onclick="startAnalysis()">
+        Analyze Profile
+      </button>
+    </div>
+
+    <!-- Manual Entry Screen -->
+    <div class="screen" id="screen-manual">
+      <div class="screen-header">
+        <p class="eyebrow">Quick profile</p>
+        <h1 class="screen-title">Your background</h1>
+        <p class="screen-sub">Tell us about your experience and skills.</p>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Experience</label>
+          <select class="form-input" id="inputExp">
+            <option value="">Select…</option>
+            <option>0–1 years</option>
+            <option>2–4 years</option>
+            <option>5–9 years</option>
+            <option>10–15 years</option>
+            <option>15+ years</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Industry</label>
+          <select class="form-input" id="inputIndustry">
+            <option value="">Select…</option>
+            <option>Banking</option>
+            <option>Consulting</option>
+            <option>Technology</option>
+            <option>Corporate</option>
+            <option>Other</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Your skills <span style="color:var(--muted)">(press Enter after each)</span></label>
+        <div class="tag-input-wrap" id="tagWrap" onclick="document.getElementById('tagInput').focus()">
+          <input class="tag-input" id="tagInput" placeholder="e.g. Excel, Financial Modelling, SQL..." onkeydown="handleTagInput(event)">
+        </div>
+        <div class="form-hint">Add at least 3 skills for best results</div>
+      </div>
+
+      <button class="analyse-btn" onclick="startAnalysis()">Find My Matches</button>
+      <button class="back-btn" onclick="goUpload()">← Back</button>
+    </div>
+
+    <!-- Analyzing Screen -->
+    <div class="screen" id="screen-analyzing">
+      <div class="screen-header">
+        <p class="eyebrow">Analyzing</p>
+        <h1 class="screen-title">Crunching the data...</h1>
+        <p class="screen-sub">Matching your skills to real job requirements.</p>
+      </div>
+      <div style="text-align:center;padding:3rem;">
+        <div style="width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto;"></div>
+        <p style="margin-top:1rem;color:var(--muted);font-size:0.875rem;">Analyzing your profile...</p>
+      </div>
+    </div>
+
+    <!-- Results Screen -->
+    <div class="screen" id="screen-results">
+      <div class="insights-container">
+        <div class="screen-header">
+          <p class="eyebrow">Your Results</p>
+          <h1 class="screen-title">Career matches based on your profile</h1>
+        </div>
+
+        <div class="readiness-score">
+          <div class="score-circle" id="scoreCircle" style="--score:0">
+            <span class="score-value" id="scoreValue">0</span>
+          </div>
+          <div>
+            <div class="score-label">Market Readiness Score</div>
+            <p style="font-size:0.812rem;color:var(--muted);margin-top:0.25rem;" id="scoreExplanation">Calculating...</p>
+          </div>
+        </div>
+
+        <div id="matchesContainer"></div>
+
+        <div class="keyword-section" id="keywordSection" style="display:none;">
+          <h4>🔑 Keywords to add to your CV</h4>
+          <div class="keyword-grid" id="keywordGrid"></div>
+        </div>
+
+        <div id="suggestionsContainer"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<style>
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+
+<script src="js/cv-parser.js"></script>
+<script src="js/insights-engine.js"></script>
+
+<script>
+  // State
+  let currentSkills = [];
+  let analysisReport = null;
+
+  // File handling
+  function handleFile(file) {
+    if (!file) return;
+    document.getElementById('fileName').textContent = file.name;
+    document.getElementById('fileSize').textContent = (file.size / 1024).toFixed(1) + ' KB';
+    document.getElementById('fileSelected').classList.add('visible');
+    document.getElementById('dropZone').style.display = 'none';
+    document.getElementById('analyseBtn').disabled = false;
+  }
+
+  function removeFile() {
+    document.getElementById('fileSelected').classList.remove('visible');
+    document.getElementById('dropZone').style.display = 'block';
+    document.getElementById('fileInput').value = '';
+    document.getElementById('analyseBtn').disabled = true;
+  }
+
+  // Drag and drop
+  const dropZone = document.getElementById('dropZone');
+  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+  dropZone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropZone.classList.remove('dragover');
+    if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+  });
+
+  // Navigation
+  function goManual() {
+    document.getElementById('screen-upload').classList.remove('active');
+    document.getElementById('screen-manual').classList.add('active');
+    document.getElementById('navStatus').textContent = 'Manual entry';
+  }
+
+  function goUpload() {
+    document.getElementById('screen-manual').classList.remove('active');
+    document.getElementById('screen-upload').classList.add('active');
+    document.getElementById('navStatus').textContent = 'Step 1 of 3 — Upload';
+  }
+
+  // Tags
+  function handleTagInput(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const val = e.target.value.trim().toLowerCase();
+      if (val && !currentSkills.includes(val)) {
+        currentSkills.push(val);
+        renderTags();
+      }
+      e.target.value = '';
+    }
+    if (e.key === 'Backspace' && !e.target.value && currentSkills.length) {
+      currentSkills.pop();
+      renderTags();
+    }
+  }
+
+  function renderTags() {
+    const wrap = document.getElementById('tagWrap');
+    wrap.querySelectorAll('.tag').forEach(t => t.remove());
+    const input = document.getElementById('tagInput');
+    currentSkills.forEach((tag, i) => {
+      const el = document.createElement('div');
+      el.className = 'tag';
+      el.innerHTML = `${tag} <span class="tag-remove" onclick="currentSkills.splice(${i},1);renderTags();">✕</span>`;
+      wrap.insertBefore(el, input);
+    });
+  }
+
+  // Analysis
+  function startAnalysis() {
+    // Validate
+    if (currentSkills.length === 0) {
+      alert('Please add at least one skill');
+      return;
+    }
+
+    // Gather inputs
+    const userContext = {
+      experience: document.getElementById('inputExp')?.value || '',
+      industry: document.getElementById('inputIndustry')?.value || ''
+    };
+
+    // Show analyzing
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen-analyzing').classList.add('active');
+    document.getElementById('tab1').classList.add('done');
+    document.getElementById('tab2').classList.add('active');
+
+    // Run analysis with delay for UX
+    setTimeout(() => {
+      // Parse skills
+      const parsedSkills = CVParser.parse(currentSkills);
+      console.log('Parsed skills:', parsedSkills);
+      
+      // Match roles
+      const matches = CVParser.matchRoles(parsedSkills);
+      console.log('Matches:', matches);
+      
+      // Generate report
+      analysisReport = InsightsEngine.generateReport(userContext, parsedSkills, matches);
+      console.log('Report:', analysisReport);
+      
+      // Render
+      renderResults(analysisReport);
+      
+      // Update progress
+      document.getElementById('tab2').classList.add('done');
+      document.getElementById('tab3').classList.add('active');
+      document.getElementById('screen-analyzing').classList.remove('active');
+      document.getElementById('screen-results').classList.add('active');
+      document.getElementById('navStatus').textContent = 'Analysis complete';
+    }, 1500);
+  }
+
+  function renderResults(report) {
+    // Score
+    const score = report.summary.readinessScore;
+    document.getElementById('scoreCircle').style.setProperty('--score', score);
+    document.getElementById('scoreValue').textContent = score;
+    document.getElementById('scoreExplanation').textContent = 
+      score > 70 ? 'Strong profile - ready to apply' :
+      score > 40 ? 'Good foundation - consider adding skills' :
+      'Building phase - focus on skill development';
+
+    // Matches
+    const container = document.getElementById('matchesContainer');
+    const strongMatches = report.matches.filter(m => m.score > 30);
+    
+    if (strongMatches.length === 0) {
+      container.innerHTML = `
+        <div class="match-card">
+          <p style="text-align:center;color:var(--muted);padding:2rem;">
+            No strong matches found. Try adding more specific skills like "Excel", "Financial Analysis", or "Project Management".
+          </p>
+        </div>
+      `;
+    } else {
+      container.innerHTML = strongMatches.slice(0, 4).map(match => `
+        <div class="match-card">
+          <div class="match-header">
+            <div>
+              <div class="match-title">${match.title}</div>
+              <div class="match-meta">${match.quality} match • ${match.matchedSkills.length} skills aligned</div>
+            </div>
+            <span class="match-quality quality-${match.quality}">${match.quality}</span>
+          </div>
+          <div style="font-size:1.25rem;font-weight:600;color:var(--gold);margin-bottom:0.5rem;">${match.score}%</div>
+          <div class="skill-pills">
+            ${match.matchedSkills.map(s => `<span class="skill-pill matched">${s}</span>`).join('')}
+            ${match.missingSkills.slice(0, 3).map(s => `<span class="skill-pill">${s}</span>`).join('')}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Keywords
+    if (report.optimization.keywords.mustHave.length > 0) {
+      document.getElementById('keywordSection').style.display = 'block';
+      document.getElementById('keywordGrid').innerHTML = [
+        ...report.optimization.keywords.mustHave,
+        ...report.optimization.keywords.actionVerbs.slice(0, 4)
+      ].map(k => `<span class="keyword-tag">${k}</span>`).join('');
+    }
+
+    // Suggestions
+    if (report.optimization.suggestions.length > 0) {
+      document.getElementById('suggestionsContainer').innerHTML = report.optimization.suggestions.map(s => `
+        <div class="suggestion-alert">
+          <h4>${s.type === 'skill_gap' ? '⚡ Skill Gap' : s.type === 'differentiation' ? '✨ Stand Out' : '💡 Tip'}</h4>
+          <p>${s.message}</p>
+        </div>
+      `).join('');
+    }
+  }
+</script>
+
+</body>
+</html>
