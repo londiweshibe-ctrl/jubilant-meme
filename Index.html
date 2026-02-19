@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CVKonnekt — Know Where You Belong</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #0d0d0d;
+  --paper: #f5f0e8;
+  --gold: #c9a84c;
+  --gold-light: #e8c96a;
+  --charcoal: #1a1a2e;
+  --muted: #6b6b6b;
+  --border: #e0d8cc;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 400;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  padding: 1.25rem 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(245,240,232,0.9);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+
+.logo {
+  font-family: 'Newsreader', serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  text-decoration: none;
+  color: var(--ink);
+}
+.logo span { color: var(--gold); }
+
+.nav-links {
+  display: flex;
+  gap: 2.5rem;
+  align-items: center;
+}
+.nav-links a {
+  text-decoration: none;
+  color: var(--muted);
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.nav-links a:hover { color: var(--ink); }
+
+.btn-primary {
+  background: var(--ink);
+  color: var(--paper);
+  padding: 0.625rem 1.25rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+.btn-primary:hover { background: var(--gold); color: var(--ink); }
+
+.hero {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  padding: 8rem 3rem 5rem;
+  max-width: 1300px;
+  margin: 0 auto;
+  gap: 4rem;
+}
+
+.hero-eyebrow {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 1.5rem;
+}
+
+.hero h1 {
+  font-family: 'Newsreader', serif;
+  font-size: clamp(2.75rem, 5vw, 4.5rem);
+  line-height: 1.1;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  margin-bottom: 1.5rem;
+}
+
+.hero h1 em {
+  font-style: italic;
+  color: var(--gold);
+  font-weight: 400;
+}
+
+.hero p {
+  font-size: 1.125rem;
+  line-height: 1.7;
+  color: var(--muted);
+  max-width: 480px;
+  margin-bottom: 2.5rem;
+  letter-spacing: -0.01em;
+}
+
+.hero-ctas {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.btn-outline {
+  border: 1px solid var(--ink);
+  color: var(--ink);
+  padding: 0.625rem 1.25rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+.btn-outline:hover { background: var(--ink); color: var(--paper); }
+
+.hero-visual {
+  position: relative;
+  height: 520px;
+}
+
+.insight-card {
+  background: var(--ink);
+  color: var(--paper);
+  border-radius: 12px;
+  padding: 1.75rem;
+  position: absolute;
+  animation: float 6s ease-in-out infinite;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.25);
+}
+.insight-card.main {
+  width: 340px;
+  top: 60px;
+  left: 20px;
+}
+.insight-card.secondary {
+  background: white;
+  color: var(--ink);
+  width: 260px;
+  bottom: 40px;
+  right: 0;
+  animation-delay: -2s;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+  border: 1px solid var(--border);
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+.card-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 0.875rem;
+}
+
+.card-title {
+  font-family: 'Newsreader', serif;
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin-bottom: 1.25rem;
+}
+
+.role-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.625rem 0;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  font-size: 0.875rem;
+}
+.role-item:last-child { border-bottom: none; }
+
+.match-pill {
+  background: var(--gold);
+  color: var(--ink);
+  padding: 0.25rem 0.625rem;
+  border-radius: 20px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+}
+
+.keyword-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+.kw-tag {
+  background: var(--paper);
+  color: var(--ink);
+  padding: 0.375rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border: 1px solid var(--border);
+}
+
+@media (max-width: 900px) {
+  .hero { grid-template-columns: 1fr; padding: 7rem 1.5rem 3rem; }
+  .hero-visual { display: none; }
+  .nav-links { display: none; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="/">CV<span>Konnekt</span></a>
+  <div class="nav-links">
+    <a href="upload.html">Analyze CV</a>
+    <a href="#how">How it works</a>
+    <a href="upload.html" class="btn-primary">Get Started</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-text">
+    <p class="hero-eyebrow">Career Intelligence Platform</p>
+    <h1>Know exactly<br><em>where you belong.</em></h1>
+    <p>Upload your CV. Our AI reads your experience, qualifications and skills — then maps out the roles, industries and countries you're genuinely qualified for.</p>
+    <div class="hero-ctas">
+      <a href="upload.html" class="btn-primary">Discover your career path</a>
+      <a href="#how" class="btn-outline">See how it works</a>
+    </div>
+  </div>
+
+  <div class="hero-visual">
+    <div class="insight-card main">
+      <div class="card-label">Your Career Matches</div>
+      <div class="card-title">Based on: BCom + 5 yrs Finance</div>
+      <div class="role-item"><span>Financial Analyst</span><span class="match-pill">94%</span></div>
+      <div class="role-item"><span>FP&A Manager</span><span class="match-pill">88%</span></div>
+      <div class="role-item"><span>Investment Analyst</span><span class="match-pill">81%</span></div>
+    </div>
+    <div class="insight-card secondary">
+      <div class="card-label" style="color:var(--gold)">Keywords to Target</div>
+      <div class="keyword-list">
+        <span class="kw-tag">IFRS</span>
+        <span class="kw-tag">Financial Modelling</span>
+        <span class="kw-tag">SAP</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>
